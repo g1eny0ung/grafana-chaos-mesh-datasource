@@ -4,20 +4,10 @@ import React, { PureComponent, SyntheticEvent } from 'react';
 import { LegacyForms, InlineFormLabel } from '@grafana/ui';
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { DataSource } from './DataSource';
-import { ExperimentKind, defaultQuery, ChaosMeshOptions, ChaosMeshQuery } from './types';
+import { ExperimentKind, kindOptions, defaultQuery, ChaosMeshOptions, ChaosMeshQuery } from './types';
 
 const { Input, Select } = LegacyForms;
 const MarginRight4: React.FC = ({ children }) => <div style={{ marginRight: 4 }}>{children}</div>;
-
-const kindOptions: Array<SelectableValue<ExperimentKind>> = [
-  { label: 'Pod Chaos', value: 'PodChaos' },
-  { label: 'Network Chaos', value: 'NetworkChaos' },
-  { label: 'IO Chaos', value: 'IoChaos' },
-  { label: 'Time Chaos', value: 'TimeChaos' },
-  { label: 'Kernel Chaos', value: 'KernelChaos' },
-  { label: 'Stress Chaos', value: 'StressChaos' },
-  { label: 'DNS Chaos', value: 'DNSChaos' },
-];
 
 type Props = QueryEditorProps<DataSource, ChaosMeshQuery, ChaosMeshOptions>;
 
@@ -27,6 +17,7 @@ interface State {
   experimentName: string;
   namespace: SelectableValue<string>;
   kind: SelectableValue<ExperimentKind>;
+  limit: number;
 }
 
 export class QueryEditor extends PureComponent<Props, State> {
@@ -44,6 +35,7 @@ export class QueryEditor extends PureComponent<Props, State> {
       experimentName: '',
       namespace: { label: 'default', value: 'default' },
       kind: kindOptions[0],
+      limit: this.datasource.limit,
     };
   }
 
@@ -70,13 +62,19 @@ export class QueryEditor extends PureComponent<Props, State> {
     this.setState({ kind: option }, this.onRunQuery);
   };
 
+  onLimitChange = (e: SyntheticEvent<HTMLInputElement>) => {
+    const limit = parseInt(e.currentTarget.value, 10);
+    this.query.limit = limit;
+    this.setState({ limit });
+  };
+
   onRunQuery = () => {
     this.props.onChange(this.query);
     this.props.onRunQuery();
   };
 
   render() {
-    const { dnsServerCreate, availableNamespaces, experimentName, namespace, kind } = this.state;
+    const { dnsServerCreate, availableNamespaces, experimentName, namespace, kind, limit } = this.state;
 
     return (
       <div className="gf-form-inline">
@@ -106,6 +104,10 @@ export class QueryEditor extends PureComponent<Props, State> {
             />
           </div>
         </MarginRight4>
+        <div className="gf-form">
+          <InlineFormLabel tooltip="Limit the number of returned Chaos Events.">Limit</InlineFormLabel>
+          <Input type="number" value={limit} onChange={this.onLimitChange} onBlur={this.onRunQuery} />
+        </div>
       </div>
     );
   }

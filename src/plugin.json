@@ -4,6 +4,7 @@
   "id": "g1eny0ung-chaos-mesh-datasource",
   "category": "cloud",
   "metrics": true,
+  "annotations": true,
   "info": {
     "description": "Chaos Mesh (A Chaos Engineering Platform for Kubernetes) Datasource",
     "author": {

@@ -31,7 +31,7 @@ const ChaosMeshSettings: React.FC<Props> = props => {
         <div className="gf-form">
           <FormField
             label="Limit"
-            tooltip="Limit the number of returned Chaos Events. Unlimited by default."
+            tooltip="Limit the number of returned Chaos Events. The default is 25. If you want to display more events, please increase it."
             inputEl={
               <Input
                 value={options.jsonData.limit}

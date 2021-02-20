@@ -1,4 +1,4 @@
-import { DataQuery, DataSourceJsonData } from '@grafana/data';
+import { DataQuery, DataSourceJsonData, SelectableValue } from '@grafana/data';
 
 export type ExperimentKind =
   | 'PodChaos'
@@ -9,12 +9,23 @@ export type ExperimentKind =
   | 'StressChaos'
   | 'DNSChaos';
 
+export const kindOptions: Array<SelectableValue<ExperimentKind>> = [
+  { label: 'Pod Chaos', value: 'PodChaos' },
+  { label: 'Network Chaos', value: 'NetworkChaos' },
+  { label: 'IO Chaos', value: 'IoChaos' },
+  { label: 'Time Chaos', value: 'TimeChaos' },
+  { label: 'Kernel Chaos', value: 'KernelChaos' },
+  { label: 'Stress Chaos', value: 'StressChaos' },
+  { label: 'DNS Chaos', value: 'DNSChaos' },
+];
+
 export interface ChaosMeshQuery extends DataQuery {
   experimentName: string;
   namespace: string;
   kind: ExperimentKind;
   startTime: string;
   finishTime: string;
+  limit: number;
 }
 
 export const defaultQuery: Partial<ChaosMeshQuery> = {

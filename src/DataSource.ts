@@ -7,6 +7,7 @@ import {
   DataSourceInstanceSettings,
   MutableDataFrame,
   FieldType,
+  AnnotationEvent,
 } from '@grafana/data';
 import { BackendSrvRequest, getBackendSrv } from '@grafana/runtime';
 
@@ -14,13 +15,15 @@ import { ChaosMeshQuery, ChaosMeshOptions, defaultQuery, ChaosEvent } from './ty
 
 export class DataSource extends DataSourceApi<ChaosMeshQuery, ChaosMeshOptions> {
   url: string;
-  limit: number;
+  limit = 25;
 
   constructor(instanceSettings: DataSourceInstanceSettings<ChaosMeshOptions>) {
     super(instanceSettings);
 
     this.url = instanceSettings.url!;
-    this.limit = instanceSettings.jsonData.limit!;
+    if (instanceSettings.jsonData.limit) {
+      this.limit = instanceSettings.jsonData.limit;
+    }
   }
 
   private _fetch<T = any>(path: string, options: Omit<BackendSrvRequest, 'url'> = {}) {
@@ -67,6 +70,7 @@ export class DataSource extends DataSourceApi<ChaosMeshQuery, ChaosMeshOptions> 
             ...query,
             startTime: from,
             finishTime: to,
+            limit: this.limit,
           })
         ).data;
 
@@ -86,6 +90,43 @@ export class DataSource extends DataSourceApi<ChaosMeshQuery, ChaosMeshOptions> 
     );
 
     return { data };
+  }
+
+  async annotationQuery(options: any): Promise<AnnotationEvent[]> {
+    const { range, dashboard } = options;
+    const from = range.from.toISOString();
+    const to = range.to.toISOString();
+    const timezone = dashboard.timezone === '' ? undefined : dashboard.timezone;
+
+    const query = defaults(options.annotation, defaultQuery);
+
+    const data = (
+      await this.fetchDryEvents({
+        ...query,
+        startTime: from,
+        finishTime: to,
+        limit: this.limit,
+      })
+    ).data;
+
+    return data.map((d: ChaosEvent) => ({
+      title: `Experiment: ${d.experiment}`,
+      text: `
+          <span>Status: ${d.finish_time ? 'Finished' : 'Running'}</span>
+          <span>Started: ${new Date(d.start_time).toLocaleString('en-US', { timeZone: timezone })}</span>
+          ${
+            d.finish_time
+              ? `<span>Started: ${new Date(d.start_time).toLocaleString('en-US', {
+                  timeZone: timezone,
+                })}</span>`
+              : ''
+          }
+        `,
+      tags: [`namespace:${d.namespace}`, `kind:${d.kind}`],
+      time: Date.parse(d.start_time),
+      timeEnd: Date.parse(d.finish_time),
+      isRegion: true,
+    }));
   }
 
   async testDatasource() {
