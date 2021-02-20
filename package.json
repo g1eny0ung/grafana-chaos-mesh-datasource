@@ -1,6 +1,6 @@
 {
   "name": "g1eny0ung-chaos-mesh-datasource",
-  "version": "1.1.1",
+  "version": "0.1.0",
   "description": "Chaos Mesh Datasource",
   "scripts": {
     "build": "grafana-toolkit plugin:build",
