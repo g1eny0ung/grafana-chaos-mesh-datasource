@@ -1,24 +1,37 @@
 import { DataQuery, DataSourceJsonData } from '@grafana/data';
 
-export interface MyQuery extends DataQuery {
-  queryText?: string;
-  constant: number;
+export type ExperimentKind =
+  | 'PodChaos'
+  | 'NetworkChaos'
+  | 'IoChaos'
+  | 'KernelChaos'
+  | 'TimeChaos'
+  | 'StressChaos'
+  | 'DNSChaos';
+
+export interface ChaosMeshQuery extends DataQuery {
+  experimentName: string;
+  namespace: string;
+  kind: ExperimentKind;
+  startTime: string;
+  finishTime: string;
 }
 
-export const defaultQuery: Partial<MyQuery> = {
-  constant: 6.5,
+export const defaultQuery: Partial<ChaosMeshQuery> = {
+  namespace: 'default',
+  kind: 'PodChaos',
 };
 
-/**
- * These are options configured for each DataSource instance
- */
-export interface MyDataSourceOptions extends DataSourceJsonData {
-  path?: string;
+export interface ChaosMeshOptions extends DataSourceJsonData {
+  limit?: number;
 }
 
-/**
- * Value that is used in the backend, but never sent over HTTP to the frontend
- */
-export interface MySecureJsonData {
-  apiKey?: string;
+export interface ChaosEvent {
+  id: number;
+  experiment: string;
+  namespace: string;
+  kind: ExperimentKind;
+  message: string;
+  start_time: string;
+  finish_time: string;
 }

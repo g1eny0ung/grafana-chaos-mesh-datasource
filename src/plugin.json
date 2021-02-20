@@ -1,7 +1,7 @@
 {
   "type": "datasource",
   "name": "Chaos Mesh",
-  "id": "chaos-mesh-chaos-mesh-datasource",
+  "id": "g1eny0ung-chaos-mesh-datasource",
   "metrics": true,
   "info": {
     "description": "A Chaos Engineering Platform for Kubernetes",
