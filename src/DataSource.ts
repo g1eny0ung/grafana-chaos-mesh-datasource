@@ -1,17 +1,16 @@
-import defaults from 'lodash/defaults';
-
 import {
+  AnnotationEvent,
   DataQueryRequest,
   DataQueryResponse,
   DataSourceApi,
   DataSourceInstanceSettings,
-  MutableDataFrame,
   FieldType,
-  AnnotationEvent,
+  MutableDataFrame,
 } from '@grafana/data';
 import { BackendSrvRequest, getBackendSrv } from '@grafana/runtime';
+import { ChaosEvent, ChaosMeshOptions, ChaosMeshQuery, defaultQuery } from './types';
 
-import { ChaosMeshQuery, ChaosMeshOptions, defaultQuery, ChaosEvent } from './types';
+import defaults from 'lodash/defaults';
 
 export class DataSource extends DataSourceApi<ChaosMeshQuery, ChaosMeshOptions> {
   url: string;
@@ -50,7 +49,7 @@ export class DataSource extends DataSourceApi<ChaosMeshQuery, ChaosMeshOptions> 
     const to = range.to.toISOString();
 
     const data = await Promise.all(
-      options.targets.map(async target => {
+      options.targets.map(async (target) => {
         const query = defaults(target, defaultQuery);
 
         const frame = new MutableDataFrame({
@@ -74,7 +73,7 @@ export class DataSource extends DataSourceApi<ChaosMeshQuery, ChaosMeshOptions> 
           })
         ).data;
 
-        data.forEach(d =>
+        data.forEach((d) =>
           frame.add({
             Experiment: d.experiment,
             Namespace: d.namespace,

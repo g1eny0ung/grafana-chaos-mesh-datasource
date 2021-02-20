@@ -1,8 +1,8 @@
-import { DataSourcePlugin } from '@grafana/data';
-import { DataSource } from './DataSource';
-import { ConfigEditor } from './ConfigEditor';
-import { QueryEditor } from './QueryEditor';
 import { AnnotationQueryEditor } from './AnnotationQueryEditor';
+import { ConfigEditor } from './ConfigEditor';
+import { DataSource } from './DataSource';
+import { DataSourcePlugin } from '@grafana/data';
+import { QueryEditor } from './QueryEditor';
 
 export const plugin = new DataSourcePlugin(DataSource)
   .setConfigEditor(ConfigEditor)

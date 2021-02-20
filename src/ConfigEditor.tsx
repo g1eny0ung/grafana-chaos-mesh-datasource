@@ -1,12 +1,12 @@
-import React from 'react';
-import { DataSourceHttpSettings } from '@grafana/ui';
-import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
 import { ChaosMeshOptions } from './types';
 import ChaosMeshSettings from './ChaosMeshSettings';
+import { DataSourceHttpSettings } from '@grafana/ui';
+import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
+import React from 'react';
 
 type Props = DataSourcePluginOptionsEditorProps<ChaosMeshOptions>;
 
-export const ConfigEditor: React.FC<Props> = props => {
+export const ConfigEditor: React.FC<Props> = (props) => {
   const { options, onOptionsChange } = props;
 
   return (

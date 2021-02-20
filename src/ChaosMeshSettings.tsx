@@ -1,4 +1,5 @@
 import React, { SyntheticEvent } from 'react';
+
 import { ChaosMeshOptions } from './types';
 import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
 import { LegacyForms } from '@grafana/ui';
@@ -21,7 +22,7 @@ const onChangeHandler = (
 
 type Props = Pick<DataSourcePluginOptionsEditorProps<ChaosMeshOptions>, 'options' | 'onOptionsChange'>;
 
-const ChaosMeshSettings: React.FC<Props> = props => {
+const ChaosMeshSettings: React.FC<Props> = (props) => {
   const { options, onOptionsChange } = props;
 
   return (
