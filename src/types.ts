@@ -28,7 +28,6 @@ interface ChaosMeshCommonQuery {
 export interface ChaosMeshQuery extends DataQuery, ChaosMeshCommonQuery {
   startTime?: string;
   finishTime?: string;
-  limit?: number;
 }
 
 export const defaultQuery: Partial<ChaosMeshQuery> = {

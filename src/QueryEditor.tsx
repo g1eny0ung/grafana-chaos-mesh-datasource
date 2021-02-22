@@ -17,7 +17,6 @@ interface State {
   experimentName: string;
   namespace: string;
   kind: ExperimentKind;
-  limit: number;
 }
 
 export class QueryEditor extends PureComponent<Props, State> {
@@ -35,7 +34,6 @@ export class QueryEditor extends PureComponent<Props, State> {
       experimentName: this.query.experimentName || '',
       namespace: this.query.namespace || 'default',
       kind: this.query.kind || 'PodChaos',
-      limit: this.query.limit || this.datasource.limit,
     };
   }
 
@@ -66,19 +64,13 @@ export class QueryEditor extends PureComponent<Props, State> {
     this.setState({ kind: value }, this.onRunQuery);
   };
 
-  onLimitChange = (e: SyntheticEvent<HTMLInputElement>) => {
-    const limit = parseInt(e.currentTarget.value, 10);
-    this.query.limit = limit;
-    this.setState({ limit });
-  };
-
   onRunQuery = () => {
     this.props.onChange(this.query);
     this.props.onRunQuery();
   };
 
   render() {
-    const { dnsServerCreate, availableNamespaces, experimentName, namespace, kind, limit } = this.state;
+    const { dnsServerCreate, availableNamespaces, experimentName, namespace, kind } = this.state;
 
     return (
       <div className="gf-form-inline">
@@ -112,10 +104,6 @@ export class QueryEditor extends PureComponent<Props, State> {
             />
           </div>
         </MarginRight4>
-        <div className="gf-form">
-          <InlineFormLabel tooltip="Limit the number of returned Chaos Events.">Limit</InlineFormLabel>
-          <Input type="number" value={limit} onChange={this.onLimitChange} onBlur={this.onRunQuery} />
-        </div>
       </div>
     );
   }
