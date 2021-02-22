@@ -1,7 +1,7 @@
-import { ChaosMeshVariableQuery, ExperimentKind, kindOptions } from './types';
 import { InlineFormLabel, LegacyForms } from '@grafana/ui';
 import React, { SyntheticEvent, useEffect, useState } from 'react';
 
+import { ChaosMeshVariableQuery } from './types';
 import { SelectableValue } from '@grafana/data';
 
 const { Input, Select } = LegacyForms;
@@ -28,16 +28,12 @@ export const VariableQueryEditor: React.FC<VariableQueryProps> = ({ query, onCha
     setState({ ...state, [e.currentTarget.name]: e.currentTarget.value });
   };
 
-  const onKindChange = (option: SelectableValue<ExperimentKind>) => {
-    setState({ ...state, kind: option.value! });
-  };
-
   const onRunQuery = () => onChange(state, `metric: ${state.metric}`);
 
   useEffect(() => {
     onRunQuery();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.metric, state.kind]);
+  }, [state.metric]);
 
   return (
     <>
@@ -49,26 +45,15 @@ export const VariableQueryEditor: React.FC<VariableQueryProps> = ({ query, onCha
           onChange={onMetricChange}
         />
       </div>
-      <div className="gf-form">
-        <InlineFormLabel tooltip="Filter chaos events by specifying the name of Experiments. Support fuzzy matching. Only available when the metric is Experiment.">
-          Experiment
-        </InlineFormLabel>
-        <Input name="experimentName" value={state.experimentName} onChange={onInputChange} onBlur={onRunQuery} />
-      </div>
-      <div className="gf-form">
-        <InlineFormLabel tooltip="Filter chaos events by choosing the Namespace of Experiments.">
-          Namespace
-        </InlineFormLabel>
-        <Input name="namespace" value={state.namespace} onChange={onInputChange} onBlur={onRunQuery} />
-      </div>
-      <div className="gf-form">
-        <InlineFormLabel tooltip="Filter chaos events by choosing the Kind of Experiments.">Kind</InlineFormLabel>
-        <Select
-          options={kindOptions}
-          value={kindOptions.find(kind => kind.value === state.kind)}
-          onChange={onKindChange}
-        />
-      </div>
+
+      {state.metric === 'experiment' && (
+        <div className="gf-form">
+          <InlineFormLabel tooltip="Filter chaos events by specifying the name of Experiments. Support fuzzy matching. Only available when the metric is Experiment.">
+            Experiment
+          </InlineFormLabel>
+          <Input name="experimentName" value={state.experimentName} onChange={onInputChange} onBlur={onRunQuery} />
+        </div>
+      )}
     </>
   );
 };

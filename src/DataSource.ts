@@ -8,7 +8,14 @@ import {
   MutableDataFrame,
 } from '@grafana/data';
 import { BackendSrvRequest, getBackendSrv, getTemplateSrv } from '@grafana/runtime';
-import { ChaosEvent, ChaosMeshOptions, ChaosMeshQuery, ChaosMeshVariableQuery, defaultQuery } from './types';
+import {
+  ChaosEvent,
+  ChaosMeshOptions,
+  ChaosMeshQuery,
+  ChaosMeshVariableQuery,
+  defaultQuery,
+  kindOptions,
+} from './types';
 
 import defaults from 'lodash/defaults';
 
@@ -109,7 +116,7 @@ export class DataSource extends DataSourceApi<ChaosMeshQuery, ChaosMeshOptions> 
     const to = range.to.toISOString();
     const timezone = dashboard.timezone === '' ? undefined : dashboard.timezone;
 
-    const query = defaults(options.annotation, defaultQuery);
+    const query = { ...defaults(options.annotation, defaultQuery), ...this.getVariables() };
 
     const data = (
       await this.fetchDryEvents({
@@ -140,37 +147,28 @@ export class DataSource extends DataSourceApi<ChaosMeshQuery, ChaosMeshOptions> 
     }));
   }
 
-  async metricFindQuery(query: ChaosMeshVariableQuery, options?: any) {
-    let data = (
-      await this.fetchDryEvents({
-        limit: this.limit,
-      } as ChaosMeshQuery)
-    ).data;
-
-    const { metric, experimentName, namespace, kind } = query;
+  async metricFindQuery(query: ChaosMeshVariableQuery) {
+    const { metric, experimentName } = query;
 
     if (metric === 'experiment' && experimentName) {
-      data = data.filter(d => d.experiment.includes(experimentName));
+      return (
+        await this.fetchDryEvents({
+          limit: this.limit,
+        } as ChaosMeshQuery)
+      ).data
+        .filter(d => d.experiment.includes(experimentName))
+        .map(d => ({ text: d.experiment }));
     }
 
-    if (namespace) {
-      data = data.filter(d => d.namespace === namespace);
+    if (metric === 'namespace') {
+      return (await this.fetchAvailableNamespaces()).data.map(d => ({ text: d }));
     }
 
-    if (kind) {
-      data = data.filter(d => d.kind === kind);
+    if (metric === 'kind') {
+      return kindOptions.map(d => ({ text: d.value as string }));
     }
 
-    return data.map(d => ({
-      text:
-        metric === 'experiment'
-          ? d.experiment
-          : metric === 'namespace'
-          ? d.namespace
-          : metric === 'kind'
-          ? d.kind
-          : d.experiment,
-    }));
+    return [];
   }
 
   async testDatasource() {
