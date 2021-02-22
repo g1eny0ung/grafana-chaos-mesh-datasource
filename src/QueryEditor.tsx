@@ -15,8 +15,8 @@ interface State {
   dnsServerCreate: boolean;
   availableNamespaces: Array<SelectableValue<string>>;
   experimentName: string;
-  namespace: SelectableValue<string>;
-  kind: SelectableValue<ExperimentKind>;
+  namespace: string;
+  kind: ExperimentKind;
   limit: number;
 }
 
@@ -32,10 +32,10 @@ export class QueryEditor extends PureComponent<Props, State> {
     this.state = {
       dnsServerCreate: false,
       availableNamespaces: [],
-      experimentName: '',
-      namespace: { label: 'default', value: 'default' },
-      kind: kindOptions[0],
-      limit: this.datasource.limit,
+      experimentName: this.query.experimentName || '',
+      namespace: this.query.namespace || 'default',
+      kind: this.query.kind || 'PodChaos',
+      limit: this.query.limit || this.datasource.limit,
     };
   }
 
@@ -53,13 +53,17 @@ export class QueryEditor extends PureComponent<Props, State> {
   };
 
   onNamespaceChange = (option: SelectableValue<string>) => {
-    this.query.namespace = option.value!;
-    this.setState({ namespace: option }, this.onRunQuery);
+    const value = option.value!;
+
+    this.query.namespace = value;
+    this.setState({ namespace: value }, this.onRunQuery);
   };
 
   onKindChange = (option: SelectableValue<ExperimentKind>) => {
-    this.query.kind = option.value!;
-    this.setState({ kind: option }, this.onRunQuery);
+    const value = option.value!;
+
+    this.query.kind = value;
+    this.setState({ kind: value }, this.onRunQuery);
   };
 
   onLimitChange = (e: SyntheticEvent<HTMLInputElement>) => {
@@ -91,7 +95,11 @@ export class QueryEditor extends PureComponent<Props, State> {
             <InlineFormLabel tooltip="Filter chaos events by choosing the Namespace of Experiments.">
               Namespace
             </InlineFormLabel>
-            <Select options={availableNamespaces} value={namespace} onChange={this.onNamespaceChange} />
+            <Select
+              options={availableNamespaces}
+              value={availableNamespaces.find(n => n.value === namespace)}
+              onChange={this.onNamespaceChange}
+            />
           </div>
         </MarginRight4>
         <MarginRight4>
@@ -99,7 +107,7 @@ export class QueryEditor extends PureComponent<Props, State> {
             <InlineFormLabel tooltip="Filter chaos events by choosing the Kind of Experiments.">Kind</InlineFormLabel>
             <Select
               options={dnsServerCreate ? kindOptions : kindOptions.filter(kind => kind.value !== 'DNSChaos')}
-              value={kind}
+              value={kindOptions.find(k => k.value === kind)}
               onChange={this.onKindChange}
             />
           </div>
