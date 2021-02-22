@@ -7,8 +7,8 @@ import {
   FieldType,
   MutableDataFrame,
 } from '@grafana/data';
-import { BackendSrvRequest, getBackendSrv } from '@grafana/runtime';
-import { ChaosEvent, ChaosMeshOptions, ChaosMeshQuery, defaultQuery } from './types';
+import { BackendSrvRequest, getBackendSrv, getTemplateSrv } from '@grafana/runtime';
+import { ChaosEvent, ChaosMeshOptions, ChaosMeshQuery, ChaosMeshVariableQuery, defaultQuery } from './types';
 
 import defaults from 'lodash/defaults';
 
@@ -43,14 +43,26 @@ export class DataSource extends DataSourceApi<ChaosMeshQuery, ChaosMeshOptions> 
       params,
     });
 
+  getVariables() {
+    return getTemplateSrv()
+      .getVariables()
+      .filter((d: any) => d.datasource === 'Chaos Mesh')
+      .map((d: any) => {
+        const type = d.definition.split(': ')[1];
+
+        return { [type === 'experiment' ? 'experimentName' : type]: d.current.value };
+      })
+      .reduce((acc, d) => ({ ...acc, ...d }), {});
+  }
+
   async query(options: DataQueryRequest<ChaosMeshQuery>): Promise<DataQueryResponse> {
     const { range } = options;
     const from = range.from.toISOString();
     const to = range.to.toISOString();
 
     const data = await Promise.all(
-      options.targets.map(async (target) => {
-        const query = defaults(target, defaultQuery);
+      options.targets.map(async target => {
+        const query = { ...defaults(target, defaultQuery), ...this.getVariables() };
 
         const frame = new MutableDataFrame({
           refId: query.refId,
@@ -73,7 +85,7 @@ export class DataSource extends DataSourceApi<ChaosMeshQuery, ChaosMeshOptions> 
           })
         ).data;
 
-        data.forEach((d) =>
+        data.forEach(d =>
           frame.add({
             Experiment: d.experiment,
             Namespace: d.namespace,
@@ -125,6 +137,39 @@ export class DataSource extends DataSourceApi<ChaosMeshQuery, ChaosMeshOptions> 
       time: Date.parse(d.start_time),
       timeEnd: Date.parse(d.finish_time),
       isRegion: true,
+    }));
+  }
+
+  async metricFindQuery(query: ChaosMeshVariableQuery, options?: any) {
+    let data = (
+      await this.fetchDryEvents({
+        limit: this.limit,
+      } as ChaosMeshQuery)
+    ).data;
+
+    const { metric, experimentName, namespace, kind } = query;
+
+    if (metric === 'experiment' && experimentName) {
+      data = data.filter(d => d.experiment.includes(experimentName));
+    }
+
+    if (namespace) {
+      data = data.filter(d => d.namespace === namespace);
+    }
+
+    if (kind) {
+      data = data.filter(d => d.kind === kind);
+    }
+
+    return data.map(d => ({
+      text:
+        metric === 'experiment'
+          ? d.experiment
+          : metric === 'namespace'
+          ? d.namespace
+          : metric === 'kind'
+          ? d.kind
+          : d.experiment,
     }));
   }
 

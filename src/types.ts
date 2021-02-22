@@ -19,19 +19,26 @@ export const kindOptions: Array<SelectableValue<ExperimentKind>> = [
   { label: 'DNS Chaos', value: 'DNSChaos' },
 ];
 
-export interface ChaosMeshQuery extends DataQuery {
-  experimentName: string;
-  namespace: string;
-  kind: ExperimentKind;
-  startTime: string;
-  finishTime: string;
-  limit: number;
+interface ChaosMeshCommonQuery {
+  experimentName?: string;
+  namespace?: string;
+  kind?: ExperimentKind;
+}
+
+export interface ChaosMeshQuery extends DataQuery, ChaosMeshCommonQuery {
+  startTime?: string;
+  finishTime?: string;
+  limit?: number;
 }
 
 export const defaultQuery: Partial<ChaosMeshQuery> = {
   namespace: 'default',
   kind: 'PodChaos',
 };
+
+export interface ChaosMeshVariableQuery extends ChaosMeshCommonQuery {
+  metric: 'experiment' | 'namespace' | 'kind';
+}
 
 export interface ChaosMeshOptions extends DataSourceJsonData {
   limit?: number;
