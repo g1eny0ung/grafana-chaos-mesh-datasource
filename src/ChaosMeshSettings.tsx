@@ -22,7 +22,7 @@ const onChangeHandler = (
 
 type Props = Pick<DataSourcePluginOptionsEditorProps<ChaosMeshOptions>, 'options' | 'onOptionsChange'>;
 
-const ChaosMeshSettings: React.FC<Props> = (props) => {
+const ChaosMeshSettings: React.FC<Props> = props => {
   const { options, onOptionsChange } = props;
 
   return (

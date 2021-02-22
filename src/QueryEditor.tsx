@@ -42,7 +42,7 @@ export class QueryEditor extends PureComponent<Props, State> {
   componentDidMount() {
     this.datasource
       .fetchAvailableNamespaces()
-      .then(({ data }) => this.setState({ availableNamespaces: data.map((d) => ({ label: d, value: d })) }));
+      .then(({ data }) => this.setState({ availableNamespaces: data.map(d => ({ label: d, value: d })) }));
     this.datasource.fetchConfig().then(({ data }) => this.setState({ dnsServerCreate: data.dns_server_create }));
   }
 
@@ -98,7 +98,7 @@ export class QueryEditor extends PureComponent<Props, State> {
           <div className="gf-form">
             <InlineFormLabel tooltip="Filter chaos events by choosing the Kind of Experiments.">Kind</InlineFormLabel>
             <Select
-              options={dnsServerCreate ? kindOptions : kindOptions.filter((kind) => kind.value !== 'DNSChaos')}
+              options={dnsServerCreate ? kindOptions : kindOptions.filter(kind => kind.value !== 'DNSChaos')}
               value={kind}
               onChange={this.onKindChange}
             />

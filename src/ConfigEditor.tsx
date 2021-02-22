@@ -6,7 +6,7 @@ import React from 'react';
 
 type Props = DataSourcePluginOptionsEditorProps<ChaosMeshOptions>;
 
-export const ConfigEditor: React.FC<Props> = (props) => {
+export const ConfigEditor: React.FC<Props> = props => {
   const { options, onOptionsChange } = props;
 
   return (
