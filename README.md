@@ -18,7 +18,7 @@ grafana-cli plugins install g1eny0ung-chaos-mesh-datasource
 
 After installed, you can add this data source in `Configuration -> Data Sources`, then you will enter the settings page:
 
-![img/settings.jpg](img/settings.jpg)
+![Chaos Mesh Data Source settings](https://raw.githubusercontent.com/g1eny0ung/grafana-chaos-mesh-datasource/master/img/settings.jpg)
 
 There has one field you only need to fill: `url`.
 

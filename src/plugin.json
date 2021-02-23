@@ -1,7 +1,7 @@
 {
   "type": "datasource",
   "name": "Chaos Mesh",
-  "id": "g1eny0ung-chaos-mesh-datasource",
+  "id": "g1eny0ung-chaosmesh-datasource",
   "category": "cloud",
   "metrics": true,
   "annotations": true,
@@ -19,11 +19,11 @@
     "links": [
       {
         "name": "GitHub",
-        "url": "https://github.com/g1eny0ung/chaos-mesh-datasource"
+        "url": "https://github.com/g1eny0ung/grafana-chaos-mesh-datasource"
       },
       {
         "name": "License",
-        "url": "https://github.com/g1eny0ung/chaos-mesh-datasource/blob/master/LICENSE"
+        "url": "https://github.com/g1eny0ung/grafana-chaos-mesh-datasource/blob/master/LICENSE"
       },
       {
         "name": "Chaos Mesh Website",
@@ -34,7 +34,7 @@
     "updated": "%TODAY%"
   },
   "dependencies": {
-    "grafanaVersion": "6.5.x",
+    "grafanaDependency": ">=6.5.0",
     "plugins": []
   }
 }

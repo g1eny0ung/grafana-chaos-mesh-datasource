@@ -1,5 +1,5 @@
 {
-  "name": "g1eny0ung-chaos-mesh-datasource",
+  "name": "g1eny0ung-chaosmesh-datasource",
   "version": "0.1.0",
   "description": "Chaos Mesh Datasource",
   "author": "Yue Yang <g1enyy0ung@gmail.com> (https://g1eny0ung.site)",
@@ -12,7 +12,6 @@
     "postinstall": "husky install",
     "lint-staged": "lint-staged"
   },
-  "dependencies": {},
   "devDependencies": {
     "@grafana/data": "^7.0.0",
     "@grafana/runtime": "^7.4.2",
