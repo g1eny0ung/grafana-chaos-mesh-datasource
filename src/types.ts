@@ -39,7 +39,7 @@ export interface ChaosMeshVariableQuery {
 }
 
 export interface ChaosMeshOptions extends DataSourceJsonData {
-  limit: number;
+  limit?: number;
 }
 
 export interface ChaosEvent {
