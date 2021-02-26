@@ -134,7 +134,7 @@ export class DataSource extends DataSourceApi<ChaosMeshQuery, ChaosMeshOptions> 
           <span>Started: ${new Date(d.start_time).toLocaleString('en-US', { timeZone: timezone })}</span>
           ${
             d.finish_time
-              ? `<span>Started: ${new Date(d.start_time).toLocaleString('en-US', {
+              ? `<span>Ended: ${new Date(d.finish_time).toLocaleString('en-US', {
                   timeZone: timezone,
                 })}</span>`
               : ''
