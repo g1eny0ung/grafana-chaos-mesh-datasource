@@ -47,10 +47,18 @@ export class DataSource extends DataSourceApi<ChaosMeshQuery, ChaosMeshOptions> 
 
   fetchAvailableNamespaces = () => this._fetch<string[]>('/common/chaos-available-namespaces');
 
-  fetchDryEvents = (params?: ChaosMeshQuery) =>
+  fetchDryEvents = (params?: Partial<ChaosMeshQuery>) =>
     this._fetch<ChaosEvent[]>('/events/dry', {
       params,
     });
+
+  getVariables() {
+    return getTemplateSrv()
+      .getVariables()
+      .filter((d: any) => d.datasource === 'Chaos Mesh')
+      .map((d: any) => ({ [d.name]: d.current.value }))
+      .reduce((acc, d) => ({ ...acc, ...d }), {});
+  }
 
   applyVariables(query: ChaosMeshQuery, scopedVars: ScopedVars) {
     const vars = getTemplateSrv()
@@ -62,6 +70,10 @@ export class DataSource extends DataSourceApi<ChaosMeshQuery, ChaosMeshOptions> 
     query.kind = vars[2] as ExperimentKind;
 
     return query;
+  }
+
+  interpolateVariablesInQueries(queries: ChaosMeshQuery[], scopedVars: ScopedVars) {
+    return queries.map(query => this.applyVariables(query, scopedVars));
   }
 
   async query(options: DataQueryRequest<ChaosMeshQuery>): Promise<DataQueryResponse> {
@@ -87,7 +99,7 @@ export class DataSource extends DataSourceApi<ChaosMeshQuery, ChaosMeshOptions> 
 
         const data = (
           await this.fetchDryEvents({
-            ...query,
+            ...this.constructPivotalParams(query),
             startTime: from,
             finishTime: to,
             limit: this.limit,
@@ -113,16 +125,29 @@ export class DataSource extends DataSourceApi<ChaosMeshQuery, ChaosMeshOptions> 
   }
 
   async annotationQuery(options: any): Promise<AnnotationEvent[]> {
-    const { range, dashboard, scopedVars } = options;
+    const { range, dashboard } = options;
     const from = range.from.toISOString();
     const to = range.to.toISOString();
     const timezone = dashboard.timezone === '' ? undefined : dashboard.timezone;
 
-    const query = this.applyVariables(defaults(options.annotation, defaultQuery), scopedVars);
+    const query = defaults(options.annotation, defaultQuery);
+
+    const pParams: any = this.constructPivotalParams(query);
+    const vals = this.getVariables();
+
+    Object.entries(pParams).forEach((d: any) => {
+      const val = d[1];
+      const firstChar = val.charAt(0);
+      const rest = val.substring(1);
+
+      if (firstChar === '$' && vals[rest]) {
+        pParams[d[0]] = vals[rest];
+      }
+    });
 
     const data = (
       await this.fetchDryEvents({
-        ...query,
+        ...pParams,
         startTime: from,
         finishTime: to,
         limit: this.limit,
@@ -187,5 +212,24 @@ export class DataSource extends DataSourceApi<ChaosMeshQuery, ChaosMeshOptions> 
         message: error,
       };
     }
+  }
+
+  constructPivotalParams(query: Partial<ChaosMeshQuery>) {
+    const result: typeof query = {};
+    const { experimentName, namespace, kind } = query;
+
+    if (experimentName) {
+      result.experimentName = experimentName;
+    }
+
+    if (namespace) {
+      result.namespace = namespace;
+    }
+
+    if (kind) {
+      result.kind = kind;
+    }
+
+    return result;
   }
 }
