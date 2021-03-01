@@ -6,6 +6,7 @@ import {
   DataSourceInstanceSettings,
   FieldType,
   MutableDataFrame,
+  ScopedVars,
 } from '@grafana/data';
 import { BackendSrvRequest, getBackendSrv, getTemplateSrv } from '@grafana/runtime';
 import {
@@ -13,6 +14,7 @@ import {
   ChaosMeshOptions,
   ChaosMeshQuery,
   ChaosMeshVariableQuery,
+  ExperimentKind,
   defaultQuery,
   kindOptions,
 } from './types';
@@ -50,26 +52,26 @@ export class DataSource extends DataSourceApi<ChaosMeshQuery, ChaosMeshOptions> 
       params,
     });
 
-  getVariables() {
-    return getTemplateSrv()
-      .getVariables()
-      .filter((d: any) => d.datasource === 'Chaos Mesh')
-      .map((d: any) => {
-        const type = d.definition.split(': ')[1];
+  applyVariables(query: ChaosMeshQuery, scopedVars: ScopedVars) {
+    const vars = getTemplateSrv()
+      .replace(`${query.experimentName} ${query.namespace} ${query.kind}`, scopedVars)
+      .split(' ');
 
-        return { [type === 'experiment' ? 'experimentName' : type]: d.current.value };
-      })
-      .reduce((acc, d) => ({ ...acc, ...d }), {});
+    query.experimentName = vars[0];
+    query.namespace = vars[1];
+    query.kind = vars[2] as ExperimentKind;
+
+    return query;
   }
 
   async query(options: DataQueryRequest<ChaosMeshQuery>): Promise<DataQueryResponse> {
-    const { range } = options;
+    const { range, scopedVars } = options;
     const from = range.from.toISOString();
     const to = range.to.toISOString();
 
     const data = await Promise.all(
       options.targets.map(async target => {
-        const query = { ...defaults(target, defaultQuery), ...this.getVariables() };
+        const query = this.applyVariables(defaults(target, defaultQuery), scopedVars);
 
         const frame = new MutableDataFrame({
           refId: query.refId,
@@ -111,12 +113,12 @@ export class DataSource extends DataSourceApi<ChaosMeshQuery, ChaosMeshOptions> 
   }
 
   async annotationQuery(options: any): Promise<AnnotationEvent[]> {
-    const { range, dashboard } = options;
+    const { range, dashboard, scopedVars } = options;
     const from = range.from.toISOString();
     const to = range.to.toISOString();
     const timezone = dashboard.timezone === '' ? undefined : dashboard.timezone;
 
-    const query = { ...defaults(options.annotation, defaultQuery), ...this.getVariables() };
+    const query = this.applyVariables(defaults(options.annotation, defaultQuery), scopedVars);
 
     const data = (
       await this.fetchDryEvents({
