@@ -52,7 +52,7 @@ export class DataSource extends DataSourceApi<ChaosMeshQuery, ChaosMeshOptions> 
       params,
     });
 
-  getVariables() {
+  private getVariables() {
     return getTemplateSrv()
       .getVariables()
       .filter((d: any) => d.datasource === 'Chaos Mesh')
@@ -60,7 +60,7 @@ export class DataSource extends DataSourceApi<ChaosMeshQuery, ChaosMeshOptions> 
       .reduce((acc, d) => ({ ...acc, ...d }), {});
   }
 
-  applyVariables(query: ChaosMeshQuery, scopedVars: ScopedVars) {
+  private applyVariables(query: ChaosMeshQuery, scopedVars: ScopedVars) {
     const vars = getTemplateSrv()
       .replace(`${query.experimentName} ${query.namespace} ${query.kind}`, scopedVars)
       .split(' ');
@@ -214,7 +214,7 @@ export class DataSource extends DataSourceApi<ChaosMeshQuery, ChaosMeshOptions> 
     }
   }
 
-  constructPivotalParams(query: Partial<ChaosMeshQuery>) {
+  private constructPivotalParams(query: Partial<ChaosMeshQuery>) {
     const result: typeof query = {};
     const { experimentName, namespace, kind } = query;
 
