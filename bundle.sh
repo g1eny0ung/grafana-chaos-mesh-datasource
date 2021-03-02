@@ -1,7 +1,7 @@
 VERSION=$1
 
 echo "Bundled Version: $VERSION"
-echo "Start build..."
+echo "Start to build..."
 echo
 
 yarn build
