@@ -20,7 +20,7 @@ After installed, you can add this data source in **Configuration -> Data Sources
 
 ![Data Source settings](https://raw.githubusercontent.com/g1eny0ung/grafana-chaos-mesh-datasource/master/img/settings.jpg)
 
-There has one field you only need to fill: `url`.
+Only the `URL` field needs to be filled in and the others can be ignored.
 
 Assuming you have a local Chaos Mesh installed, the dashboard will default export its API in port `2333`. So, if you don't modify anything, you can simply fill `http://localhost:2333` into it.
 
@@ -51,17 +51,44 @@ Mostly, there will be three options to be responsible for filtering events:
 For real world usage, normally you will use these options in two situations:
 
 - Specify all fields to locate an experiment more precisely.
-- Let **Experiment** be empty to reduce the constraints of event filtering.
+- Let **Experiment** be empty to reduce the constraints of events filtering.
+- Pass a variable like `$experiment` to query to control the events displaying.
 
 ## Annotations
 
-This data source support displaying Chaos events on the graph panel.
+Edit example:
 
 ![Data Source annotations](https://raw.githubusercontent.com/g1eny0ung/grafana-chaos-mesh-datasource/master/img/annotations.png)
 
+For usage, you can refer to the content described by [Query](#query).
+
 ## Variables
 
-> TODO
+If you choose the Variables type to query and select the data source to Chaos Mesh, You can get three different kind values.
+
+Specify by choosing different **metric**:
+
+- Experiemnt
+
+  After selection, a text input field will occur, fill in the value of the experiment name you want to settle. Usually, you will fill in the **partial** name of some experiments to get the related experiment names.
+
+  > For example, you have two experiments:
+  >
+  > random-pod-kill and random-pod-failure
+  >
+  > Then you can fill **random** in the text field to get these experiments.
+
+- Namespace
+
+  After selection, all available namespaces will show in **Preview of values** directly. Without other operations.
+
+- Kind
+
+  Same as **Namespace**.
+
+## How to contribute
+
+Pull a request or open an issue to describe your changes or problems.
 
 ## License
 
