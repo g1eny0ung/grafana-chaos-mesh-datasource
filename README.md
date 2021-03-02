@@ -68,7 +68,7 @@ If you choose the Variables type to query and select the data source to Chaos Me
 
 Specify by choosing different **metric**:
 
-- Experiemnt
+- Experiment
 
   After selection, a text input field will occur, fill in the value of the experiment name you want to settle. Usually, you will fill in the **partial** name of some experiments to get the related experiment names.
 
