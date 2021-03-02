@@ -55,7 +55,6 @@ export class DataSource extends DataSourceApi<ChaosMeshQuery, ChaosMeshOptions> 
   private getVariables() {
     return getTemplateSrv()
       .getVariables()
-      .filter((d: any) => d.datasource === 'Chaos Mesh')
       .map((d: any) => ({ [d.name]: d.current.value }))
       .reduce((acc, d) => ({ ...acc, ...d }), {});
   }
