@@ -2,6 +2,10 @@
 
 Grafana data source plugin for Chaos Mesh.
 
+## Moved
+
+This repo is migrated to <https://github.com/chaos-mesh/chaos-mesh-datasource>.
+
 ## Features
 
 - Visualize Chaos Events on the table
